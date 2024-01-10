@@ -22,14 +22,8 @@ type UserGinH map[string]interface{}
 func GetUsers(c *gin.Context) {
 	var users []models.User
 	database.DB.Find(&users)
-
-	// Return only username and password
-	var response []UserGinH
-	for _, user := range users {
-		response = append(response, UserGinH{"username": user.Username, "password": user.Password})
-	}
-
-	c.JSON(http.StatusOK, UserGinH{"data": response})
+	
+	c.JSON(http.StatusOK, ProductGinH{"data": users})
 }
 
 // @Summary Get a user by ID
@@ -45,9 +39,7 @@ func GetUser(c *gin.Context) {
 	var user models.User
 	database.DB.First(&user, id)
 
-	// Return only username and password
-	response := UserGinH{"username": user.Username, "password": user.Password}
-	c.JSON(http.StatusOK, UserGinH{"data": response})
+	c.JSON(http.StatusOK, ProductGinH{"data": user})
 }
 
 // @Summary Create a new user
