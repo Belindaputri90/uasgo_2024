@@ -9,90 +9,95 @@ import (
 	"uasgo_2024/models"
 )
 
-//ambil data semua produk
+// ProductGinH is a type to replace gin.H for Swagger accessibility
+type ProductGinH map[string]interface{}
+
+// @Summary Get list of products
+// @Description Get list of products
+// @Tags products
+// @Accept json
+// @Produce json
+// @Success 200 {object} ProductGinH
+// @Router /products [get]
 func GetProducts(c *gin.Context) {
 	var products []models.Product
 	database.DB.Find(&products)
 
-	c.JSON(http.StatusOK, gin.H{"data": products})
+	c.JSON(http.StatusOK, ProductGinH{"data": products})
 }
 
-//ambil data produk berdasarkan ID
+// @Summary Get a product by ID
+// @Description Get a product by ID
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path int true "Product ID"
+// @Success 200 {object} ProductGinH
+// @Router /products/{id} [get]
 func GetProduct(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
-		return
-	}
-
+	id, _ := strconv.Atoi(c.Param("id"))
 	var product models.Product
-	if err := database.DB.First(&product, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
-		return
-	}
+	database.DB.First(&product, id)
 
-	c.JSON(http.StatusOK, gin.H{"data": product})
+	c.JSON(http.StatusOK, ProductGinH{"data": product})
 }
 
-//buat produk baru
+// @Summary Create a new product
+// @Description Create a new product
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param input body models.Product true "Product input"
+// @Success 200 {object} ProductGinH
+// @Router /products [post]
 func CreateProduct(c *gin.Context) {
 	var productInput models.Product
 	if err := c.ShouldBindJSON(&productInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		c.JSON(http.StatusBadRequest, ProductGinH{"error": err.Error()})
 		return
 	}
 
-	if err := database.DB.Create(&productInput).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create product"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": productInput})
+	database.DB.Create(&productInput)
+	c.JSON(http.StatusOK, ProductGinH{"data": productInput})
 }
 
-//update data produk
+// @Summary Update a product by ID
+// @Description Update a product by ID
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path int true "Product ID"
+// @Param input body models.Product true "Product input"
+// @Success 200 {object} ProductGinH
+// @Router /products/{id} [put]
 func UpdateProduct(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
-		return
-	}
-
+	id, _ := strconv.Atoi(c.Param("id"))
 	var productInput models.Product
 	if err := c.ShouldBindJSON(&productInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		c.JSON(http.StatusBadRequest, ProductGinH{"error": err.Error()})
 		return
 	}
 
 	var product models.Product
-	if err := database.DB.First(&product, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
-		return
-	}
-
+	database.DB.First(&product, id)
 	product.Name = productInput.Name
 	product.Price = productInput.Price
+	database.DB.Save(&product)
 
-	if err := database.DB.Save(&product).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update product"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": product})
+	c.JSON(http.StatusOK, ProductGinH{"data": product})
 }
 
-//hapus produk
+// @Summary Delete a product by ID
+// @Description Delete a product by ID
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path int true "Product ID"
+// @Success 200 {object} ProductGinH
+// @Router /products/{id} [delete]
 func DeleteProduct(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
-		return
-	}
+	id, _ := strconv.Atoi(c.Param("id"))
+	database.DB.Delete(&models.Product{}, id)
 
-	if err := database.DB.Delete(&models.Product{}, id).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": "Product deleted"})
+	c.JSON(http.StatusOK, ProductGinH{"data": "Product deleted"})
 }

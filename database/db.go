@@ -31,7 +31,7 @@ func migrateDatabase() {
 	}
 }
 
-// GetUserByUsername mengambil data user berdasarkan username
+//mengambil data user berdasarkan username
 func GetUserByUsername(username string) (*models.User, error) {
 	var user models.User
 	if err := DB.Where("username = ?", username).First(&user).Error; err != nil {

@@ -9,90 +9,105 @@ import (
 	"uasgo_2024/models"
 )
 
-//ambil data all user
+// UserGinH is a type to replace gin.H for Swagger accessibility
+type UserGinH map[string]interface{}
+
+// @Summary Get list of users
+// @Description Get list of users
+// @Tags users
+// @Accept json
+// @Produce json
+// @Success 200 {object} UserGinH
+// @Router /users [get]
 func GetUsers(c *gin.Context) {
 	var users []models.User
 	database.DB.Find(&users)
 
-	c.JSON(http.StatusOK, gin.H{"data": users})
+	// Return only username and password
+	var response []UserGinH
+	for _, user := range users {
+		response = append(response, UserGinH{"username": user.Username, "password": user.Password})
+	}
+
+	c.JSON(http.StatusOK, UserGinH{"data": response})
 }
 
-//ambil data user dari ID
+// @Summary Get a user by ID
+// @Description Get a user by ID
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} UserGinH
+// @Router /users/{id} [get]
 func GetUser(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-		return
-	}
-
+	id, _ := strconv.Atoi(c.Param("id"))
 	var user models.User
-	if err := database.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
+	database.DB.First(&user, id)
 
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	// Return only username and password
+	response := UserGinH{"username": user.Username, "password": user.Password}
+	c.JSON(http.StatusOK, UserGinH{"data": response})
 }
 
-//buat user 
+// @Summary Create a new user
+// @Description Create a new user
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param input body models.User true "User input"
+// @Success 200 {object} UserGinH
+// @Router /users [post]
 func CreateUser(c *gin.Context) {
 	var userInput models.User
 	if err := c.ShouldBindJSON(&userInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		c.JSON(http.StatusBadRequest, UserGinH{"error": err.Error()})
 		return
 	}
 
-	if err := database.DB.Create(&userInput).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": userInput})
+	database.DB.Create(&userInput)
+	response := UserGinH{"username": userInput.Username, "password": userInput.Password}
+	c.JSON(http.StatusOK, UserGinH{"data": response})
 }
 
-//update user
+// @Summary Update a user by ID
+// @Description Update a user by ID
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Param input body models.User true "User input"
+// @Success 200 {object} UserGinH
+// @Router /users/{id} [put]
 func UpdateUser(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-		return
-	}
-
+	id, _ := strconv.Atoi(c.Param("id"))
 	var userInput models.User
 	if err := c.ShouldBindJSON(&userInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		c.JSON(http.StatusBadRequest, UserGinH{"error": err.Error()})
 		return
 	}
 
 	var user models.User
-	if err := database.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
-
+	database.DB.First(&user, id)
 	user.Username = userInput.Username
 	user.Password = userInput.Password
+	database.DB.Save(&user)
 
-	if err := database.DB.Save(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": user})
+	response := UserGinH{"username": user.Username, "password": user.Password}
+	c.JSON(http.StatusOK, UserGinH{"data": response})
 }
 
-//delete user
+// @Summary Delete a user by ID
+// @Description Delete a user by ID
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} UserGinH
+// @Router /users/{id} [delete]
 func DeleteUser(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
-		return
-	}
+	id, _ := strconv.Atoi(c.Param("id"))
+	database.DB.Delete(&models.User{}, id)
 
-	if err := database.DB.Delete(&models.User{}, id).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": "User deleted"})
+	c.JSON(http.StatusOK, UserGinH{"data": "User deleted"})
 }

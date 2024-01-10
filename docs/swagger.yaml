@@ -1,0 +1,240 @@
+basePath: /v1
+definitions:
+  handlers.ProductGinH:
+    additionalProperties: true
+    type: object
+  handlers.UserGinH:
+    additionalProperties: true
+    type: object
+  models.Product:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  models.User:
+    properties:
+      id:
+        type: integer
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Your API description. This can be multiline.
+  title: Your API Title
+  version: "1.0"
+paths:
+  /products:
+    get:
+      consumes:
+      - application/json
+      description: Get list of products
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ProductGinH'
+      summary: Get list of products
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      description: Create a new product
+      parameters:
+      - description: Product input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ProductGinH'
+      summary: Create a new product
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ProductGinH'
+      summary: Delete a product by ID
+      tags:
+      - products
+    get:
+      consumes:
+      - application/json
+      description: Get a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ProductGinH'
+      summary: Get a product by ID
+      tags:
+      - products
+    put:
+      consumes:
+      - application/json
+      description: Update a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Product input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.ProductGinH'
+      summary: Update a product by ID
+      tags:
+      - products
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get list of users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserGinH'
+      summary: Get list of users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: User input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserGinH'
+      summary: Create a new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserGinH'
+      summary: Delete a user by ID
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserGinH'
+      summary: Get a user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User input
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.UserGinH'
+      summary: Update a user by ID
+      tags:
+      - users
+swagger: "2.0"

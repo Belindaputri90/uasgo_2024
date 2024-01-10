@@ -6,18 +6,18 @@ import (
 	"uasgo_2024/database"
 )
 
-// LoginRequest struct untuk menangkap data login dari body request
+//untuk menangkap data login dari body request
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-// LoginResponse struct untuk menanggapi hasil login
+//untuk menanggapi hasil login
 type LoginResponse struct {
 	Message string `json:"message"`
 }
 
-// LoginHandler menangani permintaan login
+//menangani permintaan login
 func LoginHandler(c *gin.Context) {
 	var loginRequest LoginRequest
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
@@ -31,7 +31,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	// Berhasil login
+	//Berhasil login
 	response := LoginResponse{Message: "Login successful"}
 	c.JSON(http.StatusOK, gin.H{"data": response})
 }

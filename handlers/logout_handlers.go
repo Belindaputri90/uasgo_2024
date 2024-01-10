@@ -1,4 +1,3 @@
-// logout_handlers.go
 package handlers
 
 import (
